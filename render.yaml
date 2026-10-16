@@ -1,17 +1,15 @@
 # Render Blueprint — Static Site for the public knowledge-graph viewer.
-# Privacy: deploy/index.html is generated locally by build_viewer.py
-# --public-only, which strips all private/quarantined material and
-# FAILS the build if its leak scan finds any private node ID or label
-# in the output. The HTML travels in two chunks under viewer-parts/
-# (host upload size limits) and the build command reassembles it
-# byte-identically before publishing.
+# Privacy: every page is generated locally from the PUBLIC layer only
+# (build_viewer.py / build_table.py / build_home.py on top of the
+# leak-gated scrub, which FAILS the build if any private node ID or
+# label survives). The graph and table HTML travel in chunks under
+# viewer-parts/ and table-parts/ (host upload size limits) and the
+# build command reassembles them byte-identically before publishing.
+# deploy/index.html (the home page) is small enough to commit whole.
 services:
   - type: web
     name: knowledge-graph
     env: static
-    buildCommand: mkdir -p deploy && cat viewer-parts/index.html.aa viewer-parts/index.html.ab > deploy/index.html
+    buildCommand: mkdir -p deploy/graph deploy/table && cat viewer-parts/index.html.aa viewer-parts/index.html.ab > deploy/graph/index.html && cat table-parts/index.html.aa table-parts/index.html.ab > deploy/table/index.html
     staticPublishPath: deploy
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    # No SPA rewrite: this is a multi-page site (/, /graph/, /table/).
