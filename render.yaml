@@ -9,7 +9,7 @@ services:
   - type: web
     name: knowledge-graph
     env: static
-    buildCommand: cat viewer-parts/index.html.aa viewer-parts/index.html.ab > deploy/index.html
+    buildCommand: mkdir -p deploy && cat viewer-parts/index.html.aa viewer-parts/index.html.ab > deploy/index.html
     staticPublishPath: deploy
     routes:
       - type: rewrite
