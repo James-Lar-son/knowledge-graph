@@ -1,0 +1,15 @@
+__pycache__/
+staging/
+inbox/*
+!inbox/.gitkeep
+*.bak.json
+
+# --- privacy: never commit anything containing private-layer material ---
+# The canonical graph, full-graph builds, and ID lookups stay local only.
+# The ONLY graph data in this repo is deploy/index.html (leak-gated public build).
+graph.working.json
+graph-viewer.html
+graph.graphml
+codebook_all_nodes.csv
+node_tags.csv
+sources_manifest.csv

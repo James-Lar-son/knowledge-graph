@@ -1,0 +1,15 @@
+# Render Blueprint — Static Site for the public knowledge-graph viewer.
+# Privacy: the build command regenerates deploy/index.html with
+# build_viewer.py --public-only, which strips all private/quarantined
+# material and FAILS the build if its leak scan finds any private node
+# ID or label in the output. A failed build leaves the old site live.
+services:
+  - type: web
+    name: knowledge-graph
+    env: static
+    buildCommand: test -f graph.working.json && python3 build_viewer.py --public-only --out deploy/index.html || echo "canonical graph not in repo (by design, see .gitignore) - publishing the committed, leak-gated deploy/index.html"
+    staticPublishPath: deploy
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

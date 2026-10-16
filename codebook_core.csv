@@ -1,0 +1,33 @@
+tag,description
+r.documented_in,EDGE: subject -documented_in-> the n.-tagged node(s) on the same highlight. Graph definition: Node was extracted from this Source.
+r.authored,EDGE: subject -authored-> the n.-tagged node(s) on the same highlight. Graph definition: Person -> Publication/Artifact.
+r.coauthored_with,EDGE: subject -coauthored_with-> the n.-tagged node(s) on the same highlight. Graph definition: Person <-> Person on a shared output. Symmetric; stored once.
+r.held_role,EDGE: subject -held_role-> the n.-tagged node(s) on the same highlight. Graph definition: Person -> Role.
+r.role_at,EDGE: subject -role_at-> the n.-tagged node(s) on the same highlight. Graph definition: Role -> Organization.
+r.during_era,EDGE: subject -during_era-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Era. Drives persistence scoring.
+r.produced,EDGE: subject -produced-> the n.-tagged node(s) on the same highlight. Graph definition: Role/Project -> Publication/Artifact.
+r.part_of,"EDGE: subject -part_of-> the n.-tagged node(s) on the same highlight. Graph definition: Project -> Project, or Artifact -> Artifact."
+r.demonstrates,EDGE: subject -demonstrates-> the n.-tagged node(s) on the same highlight. Graph definition: Evidence -> Skill/Method. The load-bearing edge for resumes.
+r.applies_method,EDGE: subject -applies_method-> the n.-tagged node(s) on the same highlight. Graph definition: Publication/Project -> Method.
+r.grounded_in,EDGE: subject -grounded_in-> the n.-tagged node(s) on the same highlight. Graph definition: Publication/Artifact/Claim -> Theory/Contribution/Principle.
+r.expresses,EDGE: subject -expresses-> the n.-tagged node(s) on the same highlight. Graph definition: Evidence/Publication/Artifact -> Value. Increments value weight.
+r.motivated_by,EDGE: subject -motivated_by-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Motivation.
+r.recurs_as,EDGE: subject -recurs_as-> the n.-tagged node(s) on the same highlight. Graph definition: Theme -> Value/Theory/Contribution/Principle. Cross-era pattern detection.
+r.translates_to,"EDGE: subject -translates_to-> the n.-tagged node(s) on the same highlight. Graph definition: Theory/Contribution/Principle -> another of the same. Same idea, different vocabulary or domain."
+r.transfers_to,"EDGE: subject -transfers_to-> the n.-tagged node(s) on the same highlight. Graph definition: Skill/Method/Theory -> Audience/Problem. Adaptive-expertise transfer, made explicit."
+r.serves_audience,EDGE: subject -serves_audience-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Audience.
+r.addresses_problem,EDGE: subject -addresses_problem-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Problem.
+r.uses_process,EDGE: subject -uses_process-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Process.
+r.sited_at,EDGE: subject -sited_at-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Place.
+r.serves_purpose,EDGE: subject -serves_purpose-> the n.-tagged node(s) on the same highlight. Graph definition: Anything -> Purpose.
+r.composes_niche,EDGE: subject -composes_niche-> the n.-tagged node(s) on the same highlight. Graph definition: Skill/Motivation/Audience -> Niche.
+r.supports,EDGE: subject -supports-> the n.-tagged node(s) on the same highlight. Graph definition: Evidence -> Claim. A claim with <2 supports is flagged weak.
+r.contradicts,EDGE: subject -contradicts-> the n.-tagged node(s) on the same highlight. Graph definition: Anything <-> Anything. Kept deliberately: tensions are material.
+r.cites,EDGE: subject -cites-> the n.-tagged node(s) on the same highlight. Graph definition: Publication -> Publication.
+r.extends,EDGE: subject -extends-> the n.-tagged node(s) on the same highlight. Graph definition: Publication -> Publication/Theory/Contribution.
+r.shares_lineage_with,"EDGE: subject -shares_lineage_with-> the n.-tagged node(s) on the same highlight. Graph definition: Publication -> Publication. Same research program, no direct citation."
+m.layer.private,META: put the node(s)/evidence from this highlight in the private (quarantined) layer. Default is the source document's layer.
+m.layer.public,META: put the node(s)/evidence from this highlight in the public layer.
+m.prov.inferred,META: provenance = inferred (not directly stated in the source). Default is verified.
+m.prov.prompt,"META: provenance = prompt — this records a known gap/question, asserts nothing."
+m.evidence,META: also create an Evidence node from this span even though an s. subject tag is present.

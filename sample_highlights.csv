@@ -1,0 +1,10 @@
+id,document,tag,content
+1,TEST synthetic memo,r.demonstrates,"TEST SPAN A: coded interview passages in Taguette and checked each code against the transcript before exporting."
+1,TEST synthetic memo,n.skill.qual_research,"TEST SPAN A: coded interview passages in Taguette and checked each code against the transcript before exporting."
+2,TEST synthetic memo,s.pub.asee2017,"TEST SPAN B: the 2017 paper frames makers through a named learning framework."
+2,TEST synthetic memo,r.cites,"TEST SPAN B: the 2017 paper frames makers through a named learning framework."
+2,TEST synthetic memo,n.pub.asee2016,"TEST SPAN B: the 2017 paper frames makers through a named learning framework."
+3,TEST synthetic memo,n.val.self_direction,"TEST SPAN C: learners chose their own projects and set their own pace throughout."
+4,TEST synthetic memo,r.demonstrates,"TEST SPAN D: built a small tag set in Taguette, applied it consistently, and exported the coding."
+4,TEST synthetic memo,n.skill.taguette_coding,"TEST SPAN D: built a small tag set in Taguette, applied it consistently, and exported the coding."
+4,TEST synthetic memo,m.prov.inferred,"TEST SPAN D: built a small tag set in Taguette, applied it consistently, and exported the coding."
