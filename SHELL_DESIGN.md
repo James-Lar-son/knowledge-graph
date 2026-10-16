@@ -85,7 +85,7 @@ GitHub app once in the dashboard to restore true auto-deploy.
 
 1. ✅ Phase 1 cross-links (viewer → Taguette documents; Taguette nav →
    graph).
-2. Landing page with live status (builder-generated) — next build.
+2. ✅ Landing page with live status (builder-generated) — live 2026-10-16 as the site root, with /graph/ and /table/ under it.
 3. Custom domains + link re-pointing (needs James at the registrar).
 4. Taguette theme alignment (`custom.css` accent + product name in both
    nav bars).
