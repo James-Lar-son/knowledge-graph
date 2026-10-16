@@ -80,6 +80,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 const GRAPH0 = __GRAPH_JSON__;
 const PUBLIC_ONLY = __PUBLIC_ONLY__;
 const TGLINKS = __TG_LINKS__;
+const DOCPAGES = __DOC_PAGES__;
 const COLORS = {Person:"#e06c5b",Organization:"#d9a441",Role:"#b5893c",Era:"#8d9e5b",
 Publication:"#5b8dd9",Artifact:"#4fa8a0",Skill:"#5bbf7a",Method:"#4f9e8f",Theory:"#7d7fd9",
 Contribution:"#a86fd9",Principle:"#c95fb0",Value:"#e05b9e",Motivation:"#e07fb0",Theme:"#9e9e5b",
@@ -234,6 +235,11 @@ function tgLinkFor(n){
   if(n.type==='Evidence'){ const e=edges.find(x=>x.source===n.id&&x.predicate==='documented_in'); if(e&&TGLINKS[e.target]) return TGLINKS[e.target]; }
   return null;
 }
+function docLinkFor(n){
+  if(DOCPAGES[n.id]) return DOCPAGES[n.id];
+  if(n.type==='Evidence'){ const e=edges.find(x=>x.source===n.id&&x.predicate==='documented_in'); if(e&&DOCPAGES[e.target]) return DOCPAGES[e.target]; }
+  return null;
+}
 function select(n){ selected=n; renderDetail(); updateCounts(); draw(); }
 function renderDetail(){
   const el=document.getElementById('detail'); if(!selected){ el.innerHTML='<div class="empty">Select a node.</div>'; return; }
@@ -243,8 +249,8 @@ function renderDetail(){
     <div class="kv"><span class="tagchip">${n.id}</span> · ${n.type} · ${n.layer} · ${n.prov}</div>
     <div class="row"><button class="primary" id="cpN">Copy n. tag</button><button id="cpS">Copy s. tag</button></div>
     <div class="kv"><span class="tagchip" id="tagTxt">${tagFor('n',n)}</span></div>`;
-  const tg=tgLinkFor(n);
-  if(tg) h+=`<div class="row"><a class="btnlink" href="${tg}" target="_blank" rel="noopener">Code in Taguette ↗</a></div>`;
+  const tg=tgLinkFor(n), dc=docLinkFor(n);
+  if(tg||dc) h+=`<div class="row">${dc?`<a class="btnlink" href="${dc}">Read document</a>`:''}${tg?`<a class="btnlink" href="${tg}" target="_blank" rel="noopener">Code in Taguette ↗</a>`:''}</div>`;
   fields.forEach(([k,lab])=>{ if(n[k]!==undefined&&n[k]!==null&&n[k]!=="") h+=`<div class="kv"><b>${lab}:</b> ${String(n[k])}</div>`; });
   const out=edges.filter(e=>e.source===n.id), inc=edges.filter(e=>e.target===n.id);
   const rowE=(e,other)=>`<div class="edgeRow" data-id="${other.id}"><span class="pred">${e.predicate}</span> ${e.via?`<span style="color:#9aa4ae">via ${e.via}</span> `:''}${other.label} <span style="color:#9aa4ae">${other.type}</span></div>`;
@@ -377,6 +383,17 @@ def main():
                    if links else "https://larson-taguette.onrender.com")
     html = html.replace("__TG_LINKS__", json.dumps(links))
     html = html.replace("__TG_PROJECT__", project_url)
+    # On-site reader pages for public sources (built by build_docs.py).
+    docpages = {}
+    if man.exists():
+        ids = {n["id"] for n in graph["nodes"]}
+        with open(man, encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                sid = (row.get("src_id") or "").strip()
+                slug = (row.get("doc_slug") or "").strip()
+                if sid in ids and slug:
+                    docpages[sid] = f"../docs/{slug}/"
+    html = html.replace("__DOC_PAGES__", json.dumps(docpages))
     Path(args.out).write_text(html)
     print(f"wrote {args.out}: {len(html)/1024:.0f} KB, "
           f"{len(graph['nodes'])} nodes / {len(graph['edges'])} edges embedded"
