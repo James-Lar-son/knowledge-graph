@@ -21,11 +21,15 @@ nodes, edges = pub["nodes"], pub["edges"]
 generated = (pub.get("meta") or {}).get("generated", "")
 
 links = {}
+readable = 0
 with open(HERE / "sources_manifest.csv", encoding="utf-8-sig") as f:
     for row in csv.DictReader(f):
         sid = (row.get("src_id") or "").strip()
         if sid and (row.get("taguette_document") or "").strip():
             links[sid] = True
+        if sid and (row.get("doc_slug") or "").strip() and \
+                any(n["id"] == sid for n in nodes):
+            readable += 1
 taguette_docs = 2  # documents physically loaded in the hosted project
 
 sources = [n for n in nodes if n["type"] == "Source"]
@@ -77,7 +81,8 @@ html = f"""<!DOCTYPE html>
   </div>
 
   <section><h2>Library</h2>
-    <div class="sub">{len(sources)} public sources · {evidence} evidence nodes · {claims} claims.
+    <div class="sub">{len(sources)} public sources · {evidence} evidence nodes · {claims} claims ·
+    <a href="docs/" style="color:var(--accent);text-decoration:none">{readable} readable on this site</a>.
     Full texts live in Taguette when a source is being coded; the rest are
     references in the graph until they enter the coding queue.</div>
     <h2 style="margin-top:14px">Not yet in Taguette ({len(queue)})</h2>
@@ -87,7 +92,8 @@ html = f"""<!DOCTYPE html>
   </section>
 
   <footer>Snapshot {generated} · Public layer only — quarantined material is
-  removed at build time and never reaches this site.</footer>
+  removed at build time and never reaches this site. ·
+  <a href="architecture/" style="color:var(--accent);text-decoration:none">How this site is built</a></footer>
 </div></body></html>
 """
 
