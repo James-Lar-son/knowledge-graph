@@ -7,7 +7,7 @@ drop a newer graph JSON onto the open viewer (it has a loader).
 
     python3 build_viewer.py [--graph graph.working.json] [--out graph-viewer.html]
 """
-import argparse, json
+import argparse, csv, json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -35,6 +35,8 @@ TEMPLATE = r"""<!DOCTYPE html>
   .typeRow.off{opacity:.38}
   label.chk{display:flex;gap:7px;align-items:center;padding:3px 0;cursor:pointer;font-size:13px}
   button{background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px}
+  a.btnlink{display:inline-block;background:var(--panel2);color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font-size:13px;text-decoration:none}
+  a.btnlink:hover{border-color:var(--accent)}
   button:hover{border-color:var(--accent)}
   button.primary{background:var(--accent);color:#191204;border-color:var(--accent);font-weight:600}
   .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -54,6 +56,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <aside id="left">
   <h1>Knowledge graph</h1>
   <div class="sub" id="counts"></div>
+  <div class="sub"><a href="__TG_PROJECT__" target="_blank" rel="noopener" style="color:#e0a458;text-decoration:none">Code in Taguette ↗</a></div>
   <h2>Find a node</h2>
   <input type="text" id="search" placeholder="label or id:slug…" autocomplete="off">
   <div id="results"></div>
@@ -75,6 +78,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 "use strict";
 const GRAPH0 = __GRAPH_JSON__;
 const PUBLIC_ONLY = __PUBLIC_ONLY__;
+const TGLINKS = __TG_LINKS__;
 const COLORS = {Person:"#e06c5b",Organization:"#d9a441",Role:"#b5893c",Era:"#8d9e5b",
 Publication:"#5b8dd9",Artifact:"#4fa8a0",Skill:"#5bbf7a",Method:"#4f9e8f",Theory:"#7d7fd9",
 Contribution:"#a86fd9",Principle:"#c95fb0",Value:"#e05b9e",Motivation:"#e07fb0",Theme:"#9e9e5b",
@@ -224,6 +228,11 @@ function centerOn(n){ view.x=-n.x; view.y=-n.y; if(view.k<1) view.k=1; draw(); }
 // ---- detail panel ----
 function tagFor(kind,n){ const [p,s]=n.id.split(/:(.*)/); return `${kind}.${p}.${s.replace(/:/g,'_')}`; }
 function copyTxt(t,btn){ navigator.clipboard.writeText(t).then(()=>{ const o=btn.textContent; btn.textContent="Copied ✓"; setTimeout(()=>btn.textContent=o,1100); }); }
+function tgLinkFor(n){
+  if(TGLINKS[n.id]) return TGLINKS[n.id];
+  if(n.type==='Evidence'){ const e=edges.find(x=>x.source===n.id&&x.predicate==='documented_in'); if(e&&TGLINKS[e.target]) return TGLINKS[e.target]; }
+  return null;
+}
 function select(n){ selected=n; renderDetail(); updateCounts(); draw(); }
 function renderDetail(){
   const el=document.getElementById('detail'); if(!selected){ el.innerHTML='<div class="empty">Select a node.</div>'; return; }
@@ -233,6 +242,8 @@ function renderDetail(){
     <div class="kv"><span class="tagchip">${n.id}</span> · ${n.type} · ${n.layer} · ${n.prov}</div>
     <div class="row"><button class="primary" id="cpN">Copy n. tag</button><button id="cpS">Copy s. tag</button></div>
     <div class="kv"><span class="tagchip" id="tagTxt">${tagFor('n',n)}</span></div>`;
+  const tg=tgLinkFor(n);
+  if(tg) h+=`<div class="row"><a class="btnlink" href="${tg}" target="_blank" rel="noopener">Code in Taguette ↗</a></div>`;
   fields.forEach(([k,lab])=>{ if(n[k]!==undefined&&n[k]!==null&&n[k]!=="") h+=`<div class="kv"><b>${lab}:</b> ${String(n[k])}</div>`; });
   const out=edges.filter(e=>e.source===n.id), inc=edges.filter(e=>e.target===n.id);
   const rowE=(e,other)=>`<div class="edgeRow" data-id="${other.id}"><span class="pred">${e.predicate}</span> ${e.via?`<span style="color:#9aa4ae">via ${e.via}</span> `:''}${other.label} <span style="color:#9aa4ae">${other.type}</span></div>`;
@@ -346,6 +357,25 @@ def main():
     payload = json.dumps(graph).replace("</script>", "<\\/script>")
     html = TEMPLATE.replace("__GRAPH_JSON__", payload)
     html = html.replace("__PUBLIC_ONLY__", "true" if args.public_only else "false")
+    # Taguette deep links: only for Source nodes present in THIS build
+    # (post-scrub), so the public build can never carry a private source's
+    # link. Mapping lives in sources_manifest.csv (taguette_* columns).
+    links = {}
+    man = HERE / "sources_manifest.csv"
+    if man.exists():
+        ids = {n["id"] for n in graph["nodes"]}
+        with open(man, encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                sid = (row.get("src_id") or "").strip()
+                pr = (row.get("taguette_project") or "").strip()
+                dc = (row.get("taguette_document") or "").strip()
+                if sid in ids and pr and dc:
+                    links[sid] = ("https://larson-taguette.onrender.com"
+                                  f"/project/{pr}/document/{dc}")
+    project_url = ("https://larson-taguette.onrender.com/project/1"
+                   if links else "https://larson-taguette.onrender.com")
+    html = html.replace("__TG_LINKS__", json.dumps(links))
+    html = html.replace("__TG_PROJECT__", project_url)
     Path(args.out).write_text(html)
     print(f"wrote {args.out}: {len(html)/1024:.0f} KB, "
           f"{len(graph['nodes'])} nodes / {len(graph['edges'])} edges embedded"
