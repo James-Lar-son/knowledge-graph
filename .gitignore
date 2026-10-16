@@ -13,3 +13,5 @@ graph.graphml
 codebook_all_nodes.csv
 node_tags.csv
 sources_manifest.csv
+deploy/graph/
+deploy/table/
