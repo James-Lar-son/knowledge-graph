@@ -57,6 +57,7 @@ TEMPLATE = r"""<!DOCTYPE html>
   <h1>Knowledge graph</h1>
   <div class="sub" id="counts"></div>
   <div class="sub"><a href="__TG_PROJECT__" target="_blank" rel="noopener" style="color:#e0a458;text-decoration:none">Code in Taguette ↗</a></div>
+  <div class="sub"><a href="../" style="color:#9aa4ae;text-decoration:none">Home</a> · <a href="../table/" style="color:#9aa4ae;text-decoration:none">Table view</a></div>
   <h2>Find a node</h2>
   <input type="text" id="search" placeholder="label or id:slug…" autocomplete="off">
   <div id="results"></div>
